@@ -16,6 +16,25 @@ enum Result {
 public enum APIResult<T> {
   case Success(T)
   case Failure(NSError, AnyObject?)
+  
+  public func flatMap<U>(@noescape transform: T throws -> U? ) rethrows
+    -> APIResult<U> {
+      debugPrint(self)
+      switch self {
+      case let .Failure(error, obj):
+        return .Failure(error, obj)
+      case let .Success(value):
+        guard let newValue = try transform(value) else {
+          let err = NSError(domain: "", code: 1, userInfo: nil)
+          return .Failure(err, nil)
+        }
+        return .Success(newValue)
+      }
+  }
+  public func map<U>(@noescape transform: T throws -> U) rethrows
+    -> APIResult<U> {
+      return try flatMap { try transform($0) }
+  }
 }
 
 class NetworkKit {
@@ -24,7 +43,7 @@ class NetworkKit {
   var params: [String: AnyObject]?
   var header: [String: AnyObject]?
   
-  var successHandler: (AnyObject -> Void)?
+  var successHandler: (NSData -> Void)?
   var errorHandler: ((Int, NSError) -> Void)?
   
   func fetch(url: String) -> NetworkKit {
@@ -32,7 +51,7 @@ class NetworkKit {
     return self
   }
   
-  func success(handler: (AnyObject -> Void)) -> NetworkKit {
+  func success(handler: (NSData -> Void)) -> NetworkKit {
     self.successHandler = handler
     return self
   }
@@ -48,9 +67,22 @@ class NetworkKit {
         .response { request, response, data, error in
           let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableLeaves)
           if let success = self.successHandler {
-            success(json)
+            success(data!)
           }
       }
     }
   }
+}
+
+class Request {
+//  func fetch<T, U>( transform: (T -> U)) -> APIResult<U> {
+//    switch transform {
+//    case let .Failure(error, obj):
+//      return .Failure(error, obj)
+//    default:
+//      break
+//    }
+//    let success = APIResult.Success("fetch")
+//    return success<U>
+//  }
 }

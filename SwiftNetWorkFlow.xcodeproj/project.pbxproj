@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		044F37651CCE661F000EDA9E /* NetTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044F37641CCE661F000EDA9E /* NetTest.swift */; };
+		044F37671CCE6BF7000EDA9E /* Movie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 044F37661CCE6BF7000EDA9E /* Movie.swift */; };
 		2C91B463A26B49EABDE53964 /* Pods_SwiftNetWorkFlow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E752FDC7E1305C7641BBD0B9 /* Pods_SwiftNetWorkFlow.framework */; };
 		5C7B4C881CCDBCBB00F3AEA4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C7B4C871CCDBCBB00F3AEA4 /* AppDelegate.swift */; };
 		5C7B4C8A1CCDBCBB00F3AEA4 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C7B4C891CCDBCBB00F3AEA4 /* ViewController.swift */; };
@@ -36,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		044F37641CCE661F000EDA9E /* NetTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetTest.swift; sourceTree = "<group>"; };
+		044F37661CCE6BF7000EDA9E /* Movie.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Movie.swift; sourceTree = "<group>"; };
 		2EAFAEAAC36C96956A9F3F40 /* Pods-SwiftNetWorkFlow.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftNetWorkFlow.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftNetWorkFlow/Pods-SwiftNetWorkFlow.debug.xcconfig"; sourceTree = "<group>"; };
 		5C7B4C841CCDBCBB00F3AEA4 /* SwiftNetWorkFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftNetWorkFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C7B4C871CCDBCBB00F3AEA4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -50,7 +54,7 @@
 		5C7B4CA31CCDBCBB00F3AEA4 /* SwiftNetWorkFlowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftNetWorkFlowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5C7B4CA71CCDBCBB00F3AEA4 /* SwiftNetWorkFlowUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftNetWorkFlowUITests.swift; sourceTree = "<group>"; };
 		5C7B4CA91CCDBCBB00F3AEA4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5C7B4CB71CCDBEAA00F3AEA4 /* NetworkKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkKit.swift; sourceTree = "<group>"; };
+		5C7B4CB71CCDBEAA00F3AEA4 /* NetworkKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = NetworkKit.swift; sourceTree = "<group>"; tabWidth = 2; };
 		9566BBD2956969986E3BEAA7 /* Pods-SwiftNetWorkFlow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SwiftNetWorkFlow.release.xcconfig"; path = "Pods/Target Support Files/Pods-SwiftNetWorkFlow/Pods-SwiftNetWorkFlow.release.xcconfig"; sourceTree = "<group>"; };
 		E752FDC7E1305C7641BBD0B9 /* Pods_SwiftNetWorkFlow.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SwiftNetWorkFlow.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -113,6 +117,8 @@
 				5C7B4C8E1CCDBCBB00F3AEA4 /* Assets.xcassets */,
 				5C7B4C901CCDBCBB00F3AEA4 /* LaunchScreen.storyboard */,
 				5C7B4C931CCDBCBB00F3AEA4 /* Info.plist */,
+				044F37641CCE661F000EDA9E /* NetTest.swift */,
+				044F37661CCE6BF7000EDA9E /* Movie.swift */,
 			);
 			path = SwiftNetWorkFlow;
 			sourceTree = "<group>";
@@ -345,6 +351,8 @@
 				5C7B4C8A1CCDBCBB00F3AEA4 /* ViewController.swift in Sources */,
 				5C7B4C881CCDBCBB00F3AEA4 /* AppDelegate.swift in Sources */,
 				5C7B4CB81CCDBEAA00F3AEA4 /* NetworkKit.swift in Sources */,
+				044F37651CCE661F000EDA9E /* NetTest.swift in Sources */,
+				044F37671CCE6BF7000EDA9E /* Movie.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
