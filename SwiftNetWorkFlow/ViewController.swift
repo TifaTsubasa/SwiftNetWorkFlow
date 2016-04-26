@@ -22,8 +22,12 @@ class MovieLoader: NetworkKit {
     return self
   }
   
-  func fetchMovie() {
-    
+  func requestMovie() -> MovieLoader {
+    let loader = self.fetch(DOUBAN_URL)
+      .success { (json) in
+        self.resultHandler?(Reflect.model(json: json, type: Movie.self))
+      }.load()
+    return loader
   }
 }
 
@@ -32,24 +36,16 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-    let error = NSError(domain: "", code: 0, userInfo: nil)
-    
 //    let res = APIResult.Success(DOUBAN_URL)
-    NetworkKit().fetch(DOUBAN_URL)
-      .success { (json) in
-        debugPrint(json)
-    }.error({ (code, error) in
-      debugPrint(error)
-    })
-      .request()
+    MovieLoader().result({ (movie) in
+      debugPrint("movie - \(movie)")
+    }).error({ (code, error) in
+      debugPrint("code = \(code), error=\(error)")
+    }).failure({ (error) in
+      debugPrint("failure - \(error)")
+    }).requestMovie()
     
   }
-
-  override func didReceiveMemoryWarning() {
-    super.didReceiveMemoryWarning()
-    // Dispose of any resources that can be recreated.
-  }
-
 
 }
 

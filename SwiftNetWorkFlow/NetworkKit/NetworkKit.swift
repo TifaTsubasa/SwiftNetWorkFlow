@@ -9,96 +9,82 @@
 import Foundation
 import Alamofire
 
-enum Result {
-  case Success
-}
-
-public enum APIResult<T> {
-  case Success(T)
-  case Failure(NSError, AnyObject?)
-  
-  public func flatMap<U>(@noescape transform: T throws -> U? ) rethrows
-    -> APIResult<U> {
-      debugPrint(self)
-      switch self {
-      case let .Failure(error, obj):
-        return .Failure(error, obj)
-      case let .Success(value):
-        guard let newValue = try transform(value) else {
-          let err = NSError(domain: "", code: 1, userInfo: nil)
-          return .Failure(err, nil)
-        }
-        return .Success(newValue)
-      }
-  }
-  public func map<U>(@noescape transform: T throws -> U) rethrows
-    -> APIResult<U> {
-      return try flatMap { try transform($0) }
-  }
+enum HttpRequestType: String {
+  case OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT
 }
 
 class NetworkKit {
   
+  var type: HttpRequestType!
   var url: String?
   var params: [String: AnyObject]?
   var headers: [String: String]?
   
-  var successHandler: (NSData -> Void)?
-  var errorHandler: ((Int, NSError) -> Void)?
-  var failureHandler: ((error: ErrorType?) -> Void)?
+  var successHandler: (AnyObject -> Void)?
+  var errorHandler: ((Int, AnyObject) -> Void)?
+  var failureHandler: (NSError -> Void)?
   
-  func fetch(url: String) -> NetworkKit {
+  var request: Request?
+  
+  func fetch(url: String, type: HttpRequestType = .GET) -> Self {
+    self.type = type
     self.url = url
     return self
   }
   
-  func params(params: [String: AnyObject]) -> NetworkKit {
+  func params(params: [String: AnyObject]) -> Self {
     self.params = params
     return self
   }
   
-  func headers(headers: [String: String]) -> NetworkKit {
+  func headers(headers: [String: String]) -> Self {
     self.headers = headers
     return self
   }
   
-  func success(handler: (AnyObject -> Void)) -> NetworkKit {
+  func success(handler: (AnyObject -> Void)) -> Self {
     self.successHandler = handler
     return self
   }
   
-  func error(handler: ((Int, NSError) -> Void)) -> NetworkKit {
+  func error(handler: ((Int, AnyObject) -> Void)) -> Self {
     self.errorHandler = handler
     return self
   }
   
-  func failure(handler: (ErrorType? -> Void)) -> NetworkKit {
+  func failure(handler: (NSError -> Void)) -> Self {
     self.failureHandler = handler
     return self
   }
   
-  func request() {
+  func load() -> Self {
+    let alamofireType = Method(rawValue: type.rawValue)!
     if let url = url {
-      Alamofire.request(.GET, url, parameters: params, encoding: .URL, headers: headers)
+      request = Alamofire.request(alamofireType, url, parameters: params, encoding: .URL, headers: headers)
         .response { request, response, data, error in
-          let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableLeaves)
-          if let success = self.successHandler {
-            success(data!)
+          let statusCode = response?.statusCode
+          
+          if let statusCode = statusCode {  // request success
+            let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableLeaves)
+
+            if statusCode == 200 {          // request success & respone right
+              self.successHandler?(json)
+              return
+            } else {                        // request sucess & response error
+              self.errorHandler?(statusCode, json)
+              return
+            }
+          }
+          if let error = error {            // request failure
+            self.failureHandler?(error)
+            return
           }
       }
     }
+    return self
   }
-}
-
-class Request {
-//  func fetch<T, U>( transform: (T -> U)) -> APIResult<U> {
-//    switch transform {
-//    case let .Failure(error, obj):
-//      return .Failure(error, obj)
-//    default:
-//      break
-//    }
-//    let success = APIResult.Success("fetch")
-//    return success<U>
-//  }
+  
+  func cancel() {
+    request?.cancel()
+  }
 }
