@@ -22,7 +22,7 @@ class MovieLoader: NetworkKit {
     return self
   }
   
-  func requestMovie() -> MovieLoader {
+  func loadMovie() -> MovieLoader {
     let loader = self.fetch(DOUBAN_URL)
       .success { (json) in
         self.resultHandler?(Reflect.model(json: json, type: Movie.self))
@@ -43,7 +43,7 @@ class ViewController: UIViewController {
       debugPrint("code = \(code), error=\(error)")
     }).failure({ (error) in
       debugPrint("failure - \(error)")
-    }).requestMovie()
+    }).loadMovie()
     
   }
 
