@@ -35,15 +35,11 @@ class ViewController: UIViewController {
     let error = NSError(domain: "", code: 0, userInfo: nil)
     
 //    let res = APIResult.Success(DOUBAN_URL)
-    
-
     NetworkKit().fetch(DOUBAN_URL)
-      .success { (data) in
-        let movie = Reflect.model(data: data, type: Movie.self)
-        
-        debugPrint(data)
-    }.error({ (statusCode, error) in
-      debugPrint("error")
+      .success { (json) in
+        debugPrint(json)
+    }.error({ (code, error) in
+      debugPrint(error)
     })
       .request()
     

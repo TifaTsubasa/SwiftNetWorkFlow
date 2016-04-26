@@ -41,17 +41,28 @@ class NetworkKit {
   
   var url: String?
   var params: [String: AnyObject]?
-  var header: [String: AnyObject]?
+  var headers: [String: String]?
   
   var successHandler: (NSData -> Void)?
   var errorHandler: ((Int, NSError) -> Void)?
+  var failureHandler: ((error: ErrorType?) -> Void)?
   
   func fetch(url: String) -> NetworkKit {
     self.url = url
     return self
   }
   
-  func success(handler: (NSData -> Void)) -> NetworkKit {
+  func params(params: [String: AnyObject]) -> NetworkKit {
+    self.params = params
+    return self
+  }
+  
+  func headers(headers: [String: String]) -> NetworkKit {
+    self.headers = headers
+    return self
+  }
+  
+  func success(handler: (AnyObject -> Void)) -> NetworkKit {
     self.successHandler = handler
     return self
   }
@@ -61,9 +72,14 @@ class NetworkKit {
     return self
   }
   
+  func failure(handler: (ErrorType? -> Void)) -> NetworkKit {
+    self.failureHandler = handler
+    return self
+  }
+  
   func request() {
     if let url = url {
-      Alamofire.request(.GET, url)
+      Alamofire.request(.GET, url, parameters: params, encoding: .URL, headers: headers)
         .response { request, response, data, error in
           let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableLeaves)
           if let success = self.successHandler {
