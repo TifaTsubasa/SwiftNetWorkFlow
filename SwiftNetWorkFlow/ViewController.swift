@@ -24,20 +24,23 @@ class MovieLoader: NetworkKit {
   
   func loadMovie() -> MovieLoader {
     let loader = self.fetch(DOUBAN_URL)
-      .success { (json) in
-        self.resultHandler?(Reflect.model(json: json, type: Movie.self))
+      .success { [weak self] (json) in
+        self!.resultHandler?(Reflect.model(json: json, type: Movie.self))
       }.load()
     return loader
+  }
+  
+  deinit {
+    debugPrint("deinit")
   }
 }
 
 class ViewController: UIViewController {
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
-//    let res = APIResult.Success(DOUBAN_URL)
-    MovieLoader().result({ (movie) in
+   MovieLoader().result({ (movie) in
       debugPrint("movie - \(movie)")
     }).error({ (code, error) in
       debugPrint("code = \(code), error=\(error)")

@@ -26,6 +26,10 @@ class NetworkKit {
   
   var request: Request?
   
+  deinit {
+    debugPrint("deinit")
+  }
+  
   func fetch(url: String, type: HttpRequestType = .GET) -> Self {
     self.type = type
     self.url = url
