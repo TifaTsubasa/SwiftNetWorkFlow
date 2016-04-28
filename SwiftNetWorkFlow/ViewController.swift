@@ -37,11 +37,14 @@ class MovieLoader: NetworkKit {
 
 class ViewController: UIViewController {
   
+  @IBOutlet weak var label: UILabel!
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
    MovieLoader().result({ (movie) in
       debugPrint("movie - \(movie)")
+      self.label.text = movie.title
     }).error({ (code, error) in
       debugPrint("code = \(code), error=\(error)")
     }).failure({ (error) in
