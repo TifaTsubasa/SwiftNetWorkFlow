@@ -15,6 +15,10 @@ enum HttpRequestType: String {
 
 class NetworkKit {
   
+  typealias SuccessType = (AnyObject -> Void)
+  typealias ErrorType = ((Int, AnyObject) -> Void)
+  typealias FailureType = (NSError -> Void)
+  
   var type: HttpRequestType!
   var url: String?
   var params: [String: AnyObject]?
@@ -24,7 +28,7 @@ class NetworkKit {
   var errorHandler: ((Int, AnyObject) -> Void)?
   var failureHandler: (NSError -> Void)?
   
-  var request: Request?
+  var httpRequest: Request?
   
   deinit {
     debugPrint("deinit")
@@ -64,7 +68,7 @@ class NetworkKit {
   func load() -> Self {
     let alamofireType = Method(rawValue: type.rawValue)!
     if let url = url {
-      request = Alamofire.request(alamofireType, url, parameters: params, encoding: .URL, headers: headers)
+      httpRequest = Alamofire.request(alamofireType, url, parameters: params, encoding: .URL, headers: headers)
         .response { request, response, data, error in
           let statusCode = response?.statusCode
           
