@@ -16,7 +16,7 @@ class Movie: NSObject {
   var douban_site = ""
   var mobile_url = ""
   var share_url = ""
-  var title = ""
+  var title: String = ""
   var id = ""
   var rating = Rating()
   var images = Images()

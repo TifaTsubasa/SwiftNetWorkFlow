@@ -1,13 +1,13 @@
 PODS:
   - Alamofire (3.3.1)
-  - TTReflect (1.2.0)
+  - TTReflect (1.3.2)
 
 DEPENDENCIES:
   - Alamofire (~> 3.3.1)
-  - TTReflect (~> 1.2.0)
+  - TTReflect (~> 1.3.2)
 
 SPEC CHECKSUMS:
   Alamofire: 369bc67b6f5ac33ded3648d7bd21c5bfb91c2ecc
-  TTReflect: bf35831cb8caddb9dc86839250ef96b3919b528d
+  TTReflect: 44c072a3ee548b0854bede08d25fab3b0e94f4f8
 
 COCOAPODS: 0.39.0
