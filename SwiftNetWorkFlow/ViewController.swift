@@ -13,25 +13,22 @@ import TTReflect
 
 let DOUBAN_URL = "https://api.douban.com/v2/movie/subject/1764796"
 
-class MovieLoader: NetworkKit {
+class MovieLoader: NetworkKit<Movie> {
   
-  var resultHandler: (Movie -> Void)?
-  
-  func result(handler: (Movie -> Void)) -> MovieLoader {
-    self.resultHandler = handler
-    return self
-  }
-  
-  func loadMovie() -> MovieLoader {
-    let loader = self.fetch(DOUBAN_URL)
-      .success { [weak self] (json) in
-        self!.resultHandler?(Reflect.model(json: json, type: Movie.self))
-      }.load()
-    return loader
-  }
-  
-  deinit {
-    debugPrint("deinit")
+  func load() {
+    NetworkKit<Movie>().fetch(DOUBAN_URL)
+      .complete { (res) in
+        do {
+          let json = try res.then { json in
+            Reflect.model(json: json, type: Movie.self)
+            }.resolve()
+          self.resultHanlder?(json)
+        } catch where error is ResultError {
+          print("error -- \(error)")
+        } catch {
+          print("failure -- \(error)")
+        }
+      }.request()
   }
 }
 
@@ -41,15 +38,11 @@ class ViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    
-   MovieLoader().result({ (movie) in
-      debugPrint("movie - \(movie)")
+   
+    MovieLoader().result { (movie) in
+      debugPrint(movie)
       self.label.text = movie.title
-    }).error({ (code, error) in
-      debugPrint("code = \(code), error=\(error)")
-    }).failure({ (error) in
-      debugPrint("failure - \(error)")
-    }).loadMovie()
+    }.load()
     
   }
 
