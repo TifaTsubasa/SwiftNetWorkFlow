@@ -128,9 +128,10 @@ class NetworkKit<Model> {
           let statusCode = response?.statusCode
           
           if let statusCode = statusCode {  // request success
-            let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableLeaves)
+            let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers)
 
             if statusCode == 200 {          // request success & respone right
+              debugPrint(json)
               self.completeHandler?(Result.Success(json))
               return
             } else {                        // request sucess & response error
