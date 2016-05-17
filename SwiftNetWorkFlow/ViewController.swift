@@ -20,7 +20,6 @@ class MovieLoader: NetworkKit<Movie> {
     NetworkKit<Movie>().fetch(DOUBAN_URL)
       .complete { (res) in
         do {
-          debugPrint(try res.resolve())
           let model = try res.then { json in
             Reflect.model(json: json, type: Movie.self)
             }.resolve()
@@ -29,9 +28,10 @@ class MovieLoader: NetworkKit<Movie> {
           let err = error as! ResultError
           self.errorHandler?(err.statusCode, err.json)
         } catch {
-          print("failure -- \(error)")
+          let err = error as NSError
+          self.failureHandler?(err)
         }
-      }.request()
+      }
   }
 }
 
@@ -40,14 +40,14 @@ class TheatersLoader: NetworkKit<[Movie]> {
     NetworkKit<[Movie]>().fetch(THEATERS_URL)
       .complete { (res) in
         do {
-          let json = try res.then { json in
+          let models = try res.then { json in
             Reflect.modelArray(json: json["subjects"], type: Movie.self)
             }.resolve()
-          debugPrint(json)
+          self.resultHanlder?(models)
         } catch {
           print(error)
         }
-      }.request()
+      }
   }
 }
 
@@ -62,12 +62,13 @@ class ViewController: UIViewController {
       self.label.text = movie.title
     }.error({ (code, json) in
       debugPrint("code = \(code), json = \(json)")
+    }).failure({ (error) in
+      debugPrint("failure = \(error)")
     }).load()
     
-//    TheatersLoader().result { (theaters) in
+    TheatersLoader().result { (theaters) in
 //      debugPrint(theaters)
-//      debugPrint(theaters)
-//    }.load()
+    }.load()
   }
 
 }

@@ -54,8 +54,6 @@ enum Result<T> {
   }
 }
 
-let error = NSError(domain: "1", code: 1, userInfo: nil)
-
 class NetworkKit<Model> {
   
   typealias SuccessType = (AnyObject -> Void)
@@ -67,9 +65,9 @@ class NetworkKit<Model> {
   var params: [String: AnyObject]?
   var headers: [String: String]?
   
-  var successHandler: (AnyObject -> Void)?
-  var errorHandler: ((Int, AnyObject) -> Void)?
-  var failureHandler: (NSError -> Void)?
+  var successHandler: SuccessType?
+  var errorHandler: ErrorType?
+  var failureHandler: FailureType?
   var resultHanlder: (Model -> Void)?
   var completeHandler: (Result<AnyObject> -> Void)?
   
@@ -95,32 +93,32 @@ class NetworkKit<Model> {
     return self
   }
   
+  func success(handler: SuccessType) -> Self {
+    self.successHandler = handler
+    return self
+  }
+  
   func result(handler: (Model -> Void)) -> Self {
     self.resultHanlder = handler
     return self
   }
   
-  func success(handler: (AnyObject -> Void)) -> Self {
-    self.successHandler = handler
-    return self
-  }
-  
-  func error(handler: ((Int, AnyObject) -> Void)) -> Self {
+  func error(handler: ErrorType) -> Self {
     self.errorHandler = handler
     return self
   }
   
-  func failure(handler: (NSError -> Void)) -> Self {
+  func failure(handler: FailureType) -> Self {
     self.failureHandler = handler
     return self
   }
   
-  func complete(handler: (Result<AnyObject> -> Void)) -> Self {
+  func complete(handler: (Result<AnyObject> -> Void)) {
     self.completeHandler = handler
-    return self
+    request()
   }
   
-  func request() -> Self {
+  func request() {
     let alamofireType = Method(rawValue: type.rawValue)!
     if let url = url {
       httpRequest = Alamofire.request(alamofireType, url, parameters: params, encoding: .URL, headers: headers)
@@ -131,7 +129,6 @@ class NetworkKit<Model> {
             let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers)
 
             if statusCode == 200 {          // request success & respone right
-              debugPrint(json)
               self.completeHandler?(Result.Success(json))
               return
             } else {                        // request sucess & response error
@@ -145,7 +142,6 @@ class NetworkKit<Model> {
           }
       }
     }
-    return self
   }
   
   func cancel() {
