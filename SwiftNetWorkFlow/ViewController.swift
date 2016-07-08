@@ -17,7 +17,7 @@ let THEATERS_URL = "https://api.douban.com/v2/movie/in_theaters"
 class MovieLoader: NetworkKit<Movie> {
   
   func load() {
-    NetworkKit<Movie>().fetch(DOUBAN_URL)
+    self.fetch(DOUBAN_URL)
       .complete { (res) in
         do {
           let model = try res.then { json in
@@ -37,7 +37,7 @@ class MovieLoader: NetworkKit<Movie> {
 
 class TheatersLoader: NetworkKit<[Movie]> {
   func load() {
-    NetworkKit<[Movie]>().fetch(THEATERS_URL)
+    self.fetch(THEATERS_URL)
       .complete { (res) in
         do {
           let models = try res.then { json in

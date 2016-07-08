@@ -113,12 +113,12 @@ class NetworkKit<Model> {
     return self
   }
   
-  func complete(handler: (Result<AnyObject> -> Void)) {
+  func complete(handler: (Result<AnyObject> -> Void)) -> Self {
     self.completeHandler = handler
-    request()
+    return request()
   }
   
-  func request() {
+  func request() -> Self {
     let alamofireType = Method(rawValue: type.rawValue)!
     if let url = url {
       httpRequest = Alamofire.request(alamofireType, url, parameters: params, encoding: .URL, headers: headers)
@@ -142,6 +142,7 @@ class NetworkKit<Model> {
           }
       }
     }
+    return self
   }
   
   func cancel() {
