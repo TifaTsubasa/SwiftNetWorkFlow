@@ -18,38 +18,27 @@ class MovieLoader: NetworkKit<Movie> {
   
   func load() {
     self.fetch(DOUBAN_URL)
-      .complete { (res) in
-        do {
-          let model = try res.then { json in
-            Reflect.model(json: json, type: Movie.self)
-            }.resolve()
-          self.resultHanlder?(model)
-        } catch where error is ResultError {
-          let err = error as! ResultError
-          self.errorHandler?(err.statusCode, err.json)
-        } catch {
-          let err = error as NSError
-          self.failureHandler?(err)
-        }
+      .complete { [weak self] (res) in
+        self!.resultTract(res.then { Reflect.model(json: $0, type: Movie.self) })
       }
   }
 }
 
-class TheatersLoader: NetworkKit<[Movie]> {
-  func load() {
-    self.fetch(THEATERS_URL)
-      .complete { (res) in
-        do {
-          let models = try res.then { json in
-            Reflect.modelArray(json: json["subjects"], type: Movie.self)
-            }.resolve()
-          self.resultHanlder?(models)
-        } catch {
-          print(error)
-        }
-      }
-  }
-}
+//class TheatersLoader: NetworkKit<[Movie]> {
+//  func load() {
+//    self.fetch(THEATERS_URL)
+//      .complete { (res) in
+//        do {
+//          let models = try res.then { json in
+//            Reflect.modelArray(json: json["subjects"], type: Movie.self)
+//            }.resolve()
+//          self.resultHanlder?(models)
+//        } catch {
+//          print(error)
+//        }
+//      }
+//  }
+//}
 
 class ViewController: UIViewController {
   
@@ -66,9 +55,9 @@ class ViewController: UIViewController {
       debugPrint("failure = \(error)")
     }).load()
     
-    TheatersLoader().result { (theaters) in
-//      debugPrint(theaters)
-    }.load()
+//    TheatersLoader().result { (theaters) in
+////      debugPrint(theaters)
+//    }.load()
   }
 
 }

@@ -8,6 +8,7 @@
 
 import Foundation
 import Alamofire
+import TTReflect
 
 enum HttpRequestType: String {
   case OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT
@@ -75,6 +76,19 @@ class NetworkKit<Model> {
   
   deinit {
     debugPrint("deinit")
+  }
+  
+  func resultTract(res: Result<Model>) {
+    do {
+      let model = try res.resolve()
+      self.resultHanlder?(model)
+    } catch where error is ResultError {
+      let err = error as! ResultError
+      self.errorHandler?(err.statusCode, err.json)
+    } catch {
+      let err = error as NSError
+      self.failureHandler?(err)
+    }
   }
   
   func fetch(url: String, type: HttpRequestType = .GET) -> Self {
