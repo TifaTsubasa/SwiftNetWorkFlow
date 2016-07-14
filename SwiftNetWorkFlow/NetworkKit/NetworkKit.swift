@@ -8,7 +8,6 @@
 
 import Foundation
 import Alamofire
-import TTReflect
 
 enum HttpRequestType: String {
   case OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT

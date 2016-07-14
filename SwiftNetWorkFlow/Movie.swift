@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import TTReflect
 
 class Movie: NSObject {
   var reviews_count = 0
@@ -21,8 +20,8 @@ class Movie: NSObject {
   var rating = Rating()
   var images = Images()
   
-  func setupReplaceObjectClass() -> [String : String] {
-    return ["rating": "Rating", "images": "Images"]
+  func setupMappingObjectClass() -> [String : AnyClass] {
+    return ["rating": Rating.self, "images": Images.self]
   }
 }
 

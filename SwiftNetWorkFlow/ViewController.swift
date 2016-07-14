@@ -19,7 +19,7 @@ class MovieLoader: NetworkKit<Movie> {
   func load() {
     self.fetch(DOUBAN_URL)
       .complete { [weak self] (res) in
-        self!.resultTract(res.then { Reflect.model(json: $0, type: Movie.self) })
+        self?.resultTract(res.then { Reflect<Movie>.mapObject(json: $0)} )
       }
   }
 }
