@@ -24,21 +24,20 @@ class MovieLoader: NetworkKit<Movie> {
   }
 }
 
-//class TheatersLoader: NetworkKit<[Movie]> {
-//  func load() {
-//    self.fetch(THEATERS_URL)
-//      .complete { (res) in
-//        do {
-//          let models = try res.then { json in
-//            Reflect.modelArray(json: json["subjects"], type: Movie.self)
-//            }.resolve()
-//          self.resultHanlder?(models)
-//        } catch {
-//          print(error)
-//        }
-//      }
-//  }
-//}
+class TheatersLoader: NetworkKit<[Movie]> {
+  func load() {
+    let a: AnyObject -> [Movie] = {json in
+      debugPrint(json["subjects"])
+      let models = Reflect<Movie>.mapObjects(json: json["subjects"])
+      debugPrint(models.count)
+      return models
+    }
+    self.fetch(THEATERS_URL)
+      .complete { [weak self] (res) in
+        self?.resultTract(res.then(a) )
+      }
+  }
+}
 
 class ViewController: UIViewController {
   
@@ -49,15 +48,16 @@ class ViewController: UIViewController {
    
     MovieLoader().result { (movie) in
       self.label.text = movie.title
+//      debugPrint(movie.rating.average)
     }.error({ (code, json) in
       debugPrint("code = \(code), json = \(json)")
     }).failure({ (error) in
       debugPrint("failure = \(error)")
     }).load()
     
-//    TheatersLoader().result { (theaters) in
-////      debugPrint(theaters)
-//    }.load()
+    TheatersLoader().result { (theaters) in
+      debugPrint(theaters)
+    }.load()
   }
 
 }

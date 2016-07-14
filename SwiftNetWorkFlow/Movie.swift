@@ -17,6 +17,7 @@ class Movie: NSObject {
   var share_url = ""
   var title: String = ""
   var id = ""
+  var alt = ""
   var rating = Rating()
   var images = Images()
   
