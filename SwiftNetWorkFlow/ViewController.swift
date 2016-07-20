@@ -27,9 +27,7 @@ class MovieLoader: NetworkKit<Movie> {
 class TheatersLoader: NetworkKit<[Movie]> {
   func load() {
     let a: AnyObject -> [Movie] = {json in
-      debugPrint(json["subjects"])
       let models = Reflect<Movie>.mapObjects(json: json["subjects"])
-      debugPrint(models.count)
       return models
     }
     self.fetch(THEATERS_URL)
@@ -45,7 +43,12 @@ class ViewController: UIViewController {
   
   override func viewDidLoad() {
     super.viewDidLoad()
-   
+    
+NetworkKit<Movie>().fetch(DOUBAN_URL)
+.success { (json) in
+  print(json)
+}.request()
+    
     MovieLoader().result { (movie) in
       self.label.text = movie.title
 //      debugPrint(movie.rating.average)
@@ -56,7 +59,7 @@ class ViewController: UIViewController {
     }).load()
     
     TheatersLoader().result { (theaters) in
-      debugPrint(theaters)
+//      debugPrint(theaters)
     }.load()
   }
 
