@@ -15,11 +15,11 @@ enum HttpRequestType: String {
 
 class NetworkKit<Model> {
   
-  typealias SuccessHandlerType = (AnyObject -> Void)
-  typealias ErrorHandlerType = ((Int, AnyObject) -> Void)
-  typealias FailureHandlerType = (NSError -> Void)
+  typealias SuccessHandlerType = (AnyObject? -> Void)
+  typealias ErrorHandlerType = ((Int, AnyObject?) -> Void)
+  typealias FailureHandlerType = (NSError? -> Void)
   typealias ResultHandlerType = (Model -> Void)
-  typealias ReflectHandlerType = (AnyObject -> Model)
+  typealias ReflectHandlerType = (AnyObject? -> Model)
   
   var type: HttpRequestType!
   var url: String?
@@ -86,22 +86,21 @@ class NetworkKit<Model> {
         .response { request, response, data, error in
           
           let statusCode = response?.statusCode
-          
           if let statusCode = statusCode {  // request success
-            let json = try! NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers)
+            let json: AnyObject? = data.flatMap {
+              return try? NSJSONSerialization.JSONObjectWithData($0, options: .MutableContainers)
+            }
             
-            if statusCode == 200 {          // request success & response right
+            if statusCode == 200 {
               self.successHandler?(json)
               if let reflectHandler = self.reflectHandler {
                 self.resultHandler?(reflectHandler(json))
               }
-            } else {                        // request sucess & response error
+            } else {
               self.errorHandler?(statusCode, json)
             }
           } else {
-            if let error = error {            // request failure
-              self.failureHandler?(error)
-            }
+            self.failureHandler?(error)
           }
       }
     }

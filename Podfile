@@ -4,13 +4,13 @@ use_frameworks!
 
 target 'SwiftNetWorkFlow' do
   pod 'Alamofire', '~> 3.3.1'
-  pod 'TTReflect', '~> 2.0.0'
+  pod 'TTReflect', '~> 2.1.0'
 
 end
 
 target 'SwiftNetWorkFlowTests' do
   inherit! :search_paths
-  # Pods for testing
+  pod 'TTReflect', '~> 2.1.0'
 end
 
 target 'SwiftNetWorkFlowUITests' do
