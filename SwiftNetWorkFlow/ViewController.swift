@@ -16,24 +16,21 @@ let THEATERS_URL = "https://api.douban.com/v2/movie/in_theaters"
 
 class MovieLoader: NetworkKit<Movie> {
   
-  func load() {
-    self.fetch(DOUBAN_URL)
-      .complete { [weak self] (res) in
-        self?.resultTract(res.then { Reflect<Movie>.mapObject(json: $0)} )
-      }
+  func load() -> Self {
+    return self.fetch(DOUBAN_URL)
+    .reflect { (json) -> Movie in
+      Reflect<Movie>.mapObject(json: json)
+    }.request()
   }
 }
 
 class TheatersLoader: NetworkKit<[Movie]> {
-  func load() {
-    let a: AnyObject -> [Movie] = {json in
+  func load() -> Self {
+    let f: AnyObject -> [Movie] = {json in
       let models = Reflect<Movie>.mapObjects(json: json["subjects"])
       return models
     }
-    self.fetch(THEATERS_URL)
-      .complete { [weak self] (res) in
-        self?.resultTract(res.then(a) )
-      }
+    return self.fetch(THEATERS_URL).reflect(f).request()
   }
 }
 
@@ -44,20 +41,32 @@ class ViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     
-NetworkKit<Movie>().fetch(DOUBAN_URL)
-.success { (json) in
-  print(json)
-}.request()
+    NetworkKit<Movie>().fetch(DOUBAN_URL)
+    .reflect { (json) -> Movie in
+      Reflect<Movie>.mapObject(json: json)
+    }.success({ (json) in
+      print(json)
+    }).result { (movie) in
+      print(movie)
+    }.request()
     
-    MovieLoader().result { (movie) in
-      self.label.text = movie.title
-//      debugPrint(movie.rating.average)
-    }.error({ (code, json) in
-      debugPrint("code = \(code), json = \(json)")
-    }).failure({ (error) in
-      debugPrint("failure = \(error)")
-    }).load()
+//    MovieLoader().result { (movie) in
+//      print(movie)
+//    }.error({ (code, json) in
+//      print(code, json)
+//    }).failure({ (error) in
+//      print("error: ", error)
+//    }).load()
     
+//    MovieLoader().result { (movie) in
+//      self.label.text = movie.title
+////      debugPrint(movie.rating.average)
+//    }.error({ (code, json) in
+//      debugPrint("code = \(code), json = \(json)")
+//    }).failure({ (error) in
+//      debugPrint("failure = \(error)")
+//    }).load()
+//    
     TheatersLoader().result { (theaters) in
 //      debugPrint(theaters)
     }.load()

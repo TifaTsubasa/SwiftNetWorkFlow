@@ -13,63 +13,24 @@ enum HttpRequestType: String {
   case OPTIONS, GET, HEAD, POST, PUT, PATCH, DELETE, TRACE, CONNECT
 }
 
-struct ResultError: ErrorType {
-  let statusCode: Int
-  let json: AnyObject
-}
-
-enum Result<T> {
-  case Success(T)
-  case Error(Int, AnyObject)
-  case Failure(NSError)
-  
-  func then<U>(f: T -> U) -> Result<U> {
-    switch self {
-    case .Success(let t): return .Success(f(t))
-    case .Error(let code, let json): return .Error(code, json)
-    case .Failure(let err): return .Failure(err)
-    }
-  }
-  
-  func then<U>(tranform: T -> Result<U>) -> Result<U> {
-    switch self {
-    case .Success(let value):
-      return tranform(value)
-    case .Error(let code, let json):
-      return .Error(code, json)
-    case .Failure(let error):
-      return .Failure(error)
-    }
-  }
-  
-  func resolve() throws -> T {
-    switch self {
-    case .Success(let value):
-      return value
-    case .Error(let code, let json):
-      throw ResultError(statusCode: code, json: json)
-    case .Failure(let error):
-      throw error
-    }
-  }
-}
-
 class NetworkKit<Model> {
   
-  typealias SuccessType = (AnyObject -> Void)
-  typealias ErrorType = ((Int, AnyObject) -> Void)
-  typealias FailureType = (NSError -> Void)
+  typealias SuccessHandlerType = (AnyObject -> Void)
+  typealias ErrorHandlerType = ((Int, AnyObject) -> Void)
+  typealias FailureHandlerType = (NSError -> Void)
+  typealias ResultHandlerType = (Model -> Void)
+  typealias ReflectHandlerType = (AnyObject -> Model)
   
   var type: HttpRequestType!
   var url: String?
   var params: [String: AnyObject]?
   var headers: [String: String]?
   
-  var successHandler: SuccessType?
-  var errorHandler: ErrorType?
-  var failureHandler: FailureType?
-  var resultHanlder: (Model -> Void)?
-  var completeHandler: (Result<AnyObject> -> Void)?
+  var successHandler: SuccessHandlerType?
+  var errorHandler: ErrorHandlerType?
+  var failureHandler: FailureHandlerType?
+  var resultHandler: ResultHandlerType?
+  var reflectHandler: ReflectHandlerType?
   
   var httpRequest: Request?
   
@@ -77,17 +38,9 @@ class NetworkKit<Model> {
     debugPrint("deinit")
   }
   
-  func resultTract(res: Result<Model>) {
-    do {
-      let model = try res.resolve()
-      self.resultHanlder?(model)
-    } catch where error is ResultError {
-      let err = error as! ResultError
-      self.errorHandler?(err.statusCode, err.json)
-    } catch {
-      let err = error as NSError
-      self.failureHandler?(err)
-    }
+  func reflect(f: ReflectHandlerType) -> Self {
+    reflectHandler = f
+    return self
   }
   
   func fetch(url: String, type: HttpRequestType = .GET) -> Self {
@@ -106,29 +59,24 @@ class NetworkKit<Model> {
     return self
   }
   
-  func success(handler: SuccessType) -> Self {
+  func success(handler: SuccessHandlerType) -> Self {
     self.successHandler = handler
     return self
   }
   
-  func result(handler: (Model -> Void)) -> Self {
-    self.resultHanlder = handler
+  func result(handler: ResultHandlerType) -> Self {
+    self.resultHandler = handler
     return self
   }
   
-  func error(handler: ErrorType) -> Self {
+  func error(handler: ErrorHandlerType) -> Self {
     self.errorHandler = handler
     return self
   }
   
-  func failure(handler: FailureType) -> Self {
+  func failure(handler: FailureHandlerType) -> Self {
     self.failureHandler = handler
     return self
-  }
-  
-  func complete(handler: (Result<AnyObject> -> Void)) -> Self {
-    self.completeHandler = handler
-    return request()
   }
   
   func request() -> Self {
@@ -136,6 +84,7 @@ class NetworkKit<Model> {
     if let url = url {
       httpRequest = Alamofire.request(alamofireType, url, parameters: params, encoding: .URL, headers: headers)
         .response { request, response, data, error in
+          
           let statusCode = response?.statusCode
           
           if let statusCode = statusCode {  // request success
@@ -143,13 +92,15 @@ class NetworkKit<Model> {
             
             if statusCode == 200 {          // request success & response right
               self.successHandler?(json)
-              self.completeHandler?(Result.Success(json))
+              if let reflectHandler = self.reflectHandler {
+                self.resultHandler?(reflectHandler(json))
+              }
             } else {                        // request sucess & response error
-              self.completeHandler?(Result.Error(statusCode, json))
+              self.errorHandler?(statusCode, json)
             }
           } else {
             if let error = error {            // request failure
-              self.completeHandler?(Result.Failure(error))
+              self.failureHandler?(error)
             }
           }
       }
