@@ -99,7 +99,7 @@ class NetworkKit<Model> {
             } else {
               self.errorHandler?(statusCode, json)
             }
-          } else {
+          } else {                          // request failure
             self.failureHandler?(error)
           }
       }
