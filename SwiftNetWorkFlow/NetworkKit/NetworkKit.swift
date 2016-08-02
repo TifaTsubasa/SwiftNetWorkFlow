@@ -18,6 +18,8 @@ class NetworkKit<Model> {
   typealias SuccessHandlerType = (AnyObject? -> Void)
   typealias ErrorHandlerType = ((Int, AnyObject?) -> Void)
   typealias FailureHandlerType = (NSError? -> Void)
+  typealias FinishHandlerType = (Void -> Void)
+  
   typealias ResultHandlerType = (Model -> Void)
   typealias ReflectHandlerType = (AnyObject? -> Model)
   
@@ -29,6 +31,7 @@ class NetworkKit<Model> {
   var successHandler: SuccessHandlerType?
   var errorHandler: ErrorHandlerType?
   var failureHandler: FailureHandlerType?
+  var finishHandler: FinishHandlerType?
   var resultHandler: ResultHandlerType?
   var reflectHandler: ReflectHandlerType?
   
@@ -59,6 +62,11 @@ class NetworkKit<Model> {
     return self
   }
   
+  func finish(handler: FinishHandlerType) -> Self {
+    self.finishHandler = handler
+    return self
+  }
+  
   func success(handler: SuccessHandlerType) -> Self {
     self.successHandler = handler
     return self
@@ -84,7 +92,7 @@ class NetworkKit<Model> {
     if let url = url {
       httpRequest = Alamofire.request(alamofireType, url, parameters: params, encoding: .URL, headers: headers)
         .response { request, response, data, error in
-          
+          self.finishHandler?()
           let statusCode = response?.statusCode
           if let statusCode = statusCode {  // request success
             let json: AnyObject? = data.flatMap {

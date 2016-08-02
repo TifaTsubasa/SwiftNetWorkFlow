@@ -50,7 +50,9 @@ class ViewController: UIViewController {
 //      print(movie)
 //    }.request()
     
-    MovieLoader().result { (movie) in
+    MovieLoader().finish({
+      
+    }).result { (movie) in
       print(movie)
     }.error({ (code, json) in
       print(code, json)
